@@ -109,8 +109,8 @@ async function main() {
 
     if (indexMaster === limit) {
       console.log(`--- [End process] Went through ${limit} requests ---`);
-      await runSemanticScorer();
-      break; // probably unnecessary
+      // await runSemanticScorer();
+      break;
     }
 
     // Step 2.3: Check if all requests have been processed
@@ -131,13 +131,13 @@ async function main() {
         `--- [End process] Went through all ${arrayOfPrioritizedParameters.length} queries ---`
       );
       // index = 0;
-      await runSemanticScorer();
+      // await runSemanticScorer();
       break; // probably unnecessary
     }
   }
   console.log("--- [End process] main and outside the while(true) loop ---");
   // // For Testing - use for ending process early wiht limit, otherwise this will already run based on other conditions
-  // runSemanticScorer();
+  runSemanticScorer();
 }
 
 function sleep(ms) {
