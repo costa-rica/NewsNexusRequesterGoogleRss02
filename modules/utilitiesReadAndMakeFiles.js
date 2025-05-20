@@ -33,8 +33,8 @@ function getRequestsParameterArrayFromExcelFile() {
       orString: row.orString || "",
       notString: row.notString || "",
       dateStartOfRequest: parsedDate || "",
-      includeDomainsArrayString: row.includeDomains || "",
-      excludeDomainsArrayString: row.excludeDomains || "",
+      // includeDomainsArrayString: row.includeDomains || "",
+      // excludeDomainsArrayString: row.excludeDomains || "",
     };
   });
   return queryObjects;

@@ -24,8 +24,8 @@ async function requester(currentParams, indexMaster) {
   const orString = currentParams.orString;
   const notString = currentParams.notString;
   const dateStartOfRequest = currentParams.dateStartOfRequest;
-  const includeDomainsArrayString = currentParams.includeDomainsArrayString;
-  const excludeDomainsArrayString = currentParams.excludeDomainsArrayString;
+  // const includeDomainsArrayString = currentParams.includeDomainsArrayString;
+  // const excludeDomainsArrayString = currentParams.excludeDomainsArrayString;
 
   const dateEndOfRequest = new Date(
     new Date().setDate(
