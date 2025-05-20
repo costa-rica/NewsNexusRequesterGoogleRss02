@@ -1,8 +1,10 @@
-# NewsNexusRequesterGoogleRss02
+# NewsNexusRequesterGoogleNewsRss02
 
 ## Overview
 
 The Google News RSS requester process is broken into two main parts:
+
+- base url: https://news.google.com/rss/
 
 ### 1. Creating Prioritized Request Parameter Array
 
@@ -38,7 +40,7 @@ PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED=/home/shared/project_resources
 PATH_AND_FILENAME_TO_SEMANTIC_SCORER=/home/shared/applications/NewsNexusSemanticScorer02/index.js
 PATH_TO_SEMANTIC_SCORER_DIR=/home/shared/project_resources/NewsNexus07/utilities/semantic_scorer
 PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/home/shared/project_resources/NewsNexus07/utilities/semantic_scorer/NewsNexusSemanticScorerKeywords.xlsx
-NAME_OF_ORG_REQUESTING_FROM="NewsData.IO"
+NAME_OF_ORG_REQUESTING_FROM="Google News RSS"
 ACTIVATE_API_REQUESTS_TO_OUTSIDE_SOURCES=true
 LIMIT_DAYS_BACK_TO_REQUEST=29
 LIMIT_MAXIMUM_MASTER_INDEX=10
