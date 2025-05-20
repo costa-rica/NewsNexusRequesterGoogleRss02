@@ -128,8 +128,6 @@ async function requester(currentParams, indexMaster) {
       `No articles received from ${process.env.NAME_OF_ORG_REQUESTING_FROM} request response`
     );
   } else {
-    console.log(`newApiRequestObj: ${newsApiRequestObj.nameOfOrg}`);
-
     // Store articles and update NewsApiRequest
     await storeNewsApiArticles(requestResponseData, newsApiRequestObj);
     console.log(`completed NewsApiRequest.id: ${newsApiRequestObj.id}`);
