@@ -164,7 +164,8 @@ async function makeGoogleRssRequest(
   //   notArray.length > 0 ? notArray.map((k) => `NOT ${k}`).join(" AND ") : "";
   const notPart =
     notArray.length > 0 ? notArray.map((k) => `-${k}`).join(" ") : "";
-  const fullQuery = [andPart, orPart, notPart].filter(Boolean).join(" AND ");
+  // const fullQuery = [andPart, orPart, notPart].filter(Boolean).join(" AND ");
+  const fullQuery = [andPart, orPart, notPart].filter(Boolean).join(" ");
 
   if (fullQuery) {
     queryParams.push(`q=${encodeURIComponent(fullQuery)}`);
@@ -173,8 +174,11 @@ async function makeGoogleRssRequest(
   // Always required
   queryParams.push("language=en");
   queryParams.push(`country=us`);
-  const requestUrl = `${source.url}search?${queryParams.join("&")}`;
+  // queryParams.push(`excludecategory=entertainment,politics,world`);
 
+  const requestUrl = `${source.url}search?${queryParams.join("&")}`;
+  // console.log("- [makeNewsApiRequestDetailed] requestUrl", requestUrl);
+  // let status = "success";
   let requestResponseData = {
     results: [],
     status: "success",
