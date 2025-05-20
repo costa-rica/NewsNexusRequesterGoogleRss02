@@ -2,7 +2,7 @@
 
 ## Overview
 
-The News Data IO requester process is broken into two main parts:
+The Google News RSS requester process is broken into two main parts:
 
 ### 1. Creating Prioritized Request Parameter Array
 
