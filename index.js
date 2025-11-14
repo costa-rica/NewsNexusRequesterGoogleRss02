@@ -1,5 +1,13 @@
 require("dotenv").config();
 console.log("Starting NewsNexusRequesterGoogleRss02");
+
+// Initialize database models BEFORE importing other modules
+const { initModels, sequelize } = require("newsnexus10db");
+initModels();
+console.log(
+  `database location: ${process.env.PATH_DATABASE}${process.env.NAME_DB}`
+);
+
 const {
   getRequestsParameterArrayFromExcelFile,
 } = require("./modules/utilitiesReadAndMakeFiles");

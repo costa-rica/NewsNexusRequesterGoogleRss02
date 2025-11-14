@@ -27,24 +27,42 @@ This methodical approach ensures comprehensive and prioritized coverage of query
 
 ## Requirements
 
-This app requires importing or adding the `newsnexus07db` package, which provides the Sequelize setup and model definitions needed to read and write to the `NewsApiRequests` table.
+This app requires importing or adding the `newsnexus10db` package, which provides the Sequelize setup and model definitions needed to read and write to the `NewsApiRequests` table.
 
 ## Environment Variables
 
+### workstation
+
 ```
-APP_NAME=NewsNexusRequesterGoogleRss02
-NAME_DB=newsnexus07.db
-PATH_DATABASE=/Users/nick/Documents/_databases/NewsNexus07/
-PATH_TO_API_RESPONSE_JSON_FILES=/Users/nick/Documents/_project_resources/NewsNexus07/api_response_json_files
-PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED=/home/shared/project_resources/NewsNexus07/utilities/automation_excel_files/AutomatedRequestsNewsDataIo.xlsx
-PATH_AND_FILENAME_TO_SEMANTIC_SCORER=/home/shared/applications/NewsNexusSemanticScorer02/index.js
-PATH_TO_SEMANTIC_SCORER_DIR=/home/shared/project_resources/NewsNexus07/utilities/semantic_scorer
-PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/home/shared/project_resources/NewsNexus07/utilities/semantic_scorer/NewsNexusSemanticScorerKeywords.xlsx
+NAME_APP=NewsNexusRequesterGoogleNewsRss02
+NAME_DB=newsnexus10.db
+PATH_DATABASE=/Users/nick/Documents/_databases/NewsNexus10/
+PATH_TO_API_RESPONSE_JSON_FILES=/Users/nick/Documents/_project_resources/NewsNexus10/api_response_json_files
+PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED=/Users/nick/Documents/_project_resources/NewsNexus10/utilities/automation_excel_files/AutomatedRequestsGoogleNewsRss.xlsx
+PATH_AND_FILENAME_TO_SEMANTIC_SCORER=/Users/nick/Documents/NewsNexusSemanticScorer02/index.js
+PATH_TO_SEMANTIC_SCORER_DIR=/Users/nick/Documents/_project_resources/NewsNexus10/utilities/semantic_scorer
+PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/Users/nick/Documents/_project_resources/NewsNexus10/utilities/semantic_scorer/NewsNexusSemanticScorerKeywords.xlsx
 NAME_OF_ORG_REQUESTING_FROM="Google News RSS"
 ACTIVATE_API_REQUESTS_TO_OUTSIDE_SOURCES=true
 LIMIT_DAYS_BACK_TO_REQUEST=29
-LIMIT_MAXIMUM_MASTER_INDEX=10
-MILISECONDS_IN_BETWEEN_REQUESTS=1100
+LIMIT_MAXIMUM_MASTER_INDEX=210
+```
+
+### server
+
+```
+NAME_APP=NewsNexusRequesterGoogleNewsRss02
+NAME_DB=newsnexus10.db
+PATH_DATABASE=/home/nick/databases/NewsNexus10/
+PATH_TO_API_RESPONSE_JSON_FILES=/home/nick/project_resources/NewsNexus10/api_response_json_files
+PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED=/home/nick/project_resources/NewsNexus10/utilities/automation_excel_files/AutomatedRequestsGoogleNewsRss.xlsx
+PATH_AND_FILENAME_TO_SEMANTIC_SCORER=/home/nick/applications/NewsNexusSemanticScorer02/index.js
+PATH_TO_SEMANTIC_SCORER_DIR=/home/nick/project_resources/NewsNexus10/utilities/semantic_scorer
+PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/home/nick/project_resources/NewsNexus10/utilities/semantic_scorer/NewsNexusSemanticScorerKeywords.xlsx
+NAME_OF_ORG_REQUESTING_FROM="Google News RSS"
+ACTIVATE_API_REQUESTS_TO_OUTSIDE_SOURCES=true
+LIMIT_DAYS_BACK_TO_REQUEST=29
+LIMIT_MAXIMUM_MASTER_INDEX=210
 ```
 
 ## Excel spreadsheet

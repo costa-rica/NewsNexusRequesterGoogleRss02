@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "newsnexus07db": "file:../NewsNexus07Db",
+    "newsnexus10db": "file:../NewsNexus10Db",
     "xlsx": "^0.18.5",
     "xml2js": "^0.6.2"
   }

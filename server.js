@@ -1,7 +1,7 @@
 require("dotenv").config();
 const originalLog = console.log;
 const originalError = console.error;
-const prefix = `[${process.env.APP_NAME}] `;
+const prefix = `[${process.env.NAME_APP}] `;
 
 console.log = (...args) => {
   originalLog(prefix, ...args);
@@ -21,7 +21,7 @@ const startMinutes = (targetTimeToStartAutomation - 1) * 60 + 55; // 22:50 UTC
 const endMinutes = targetTimeToStartAutomation * 60 + 5; // 23:10 UTC
 
 if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-  console.log(`Running ${process.env.APP_NAME} between 22:55 and 23:10 UTC`);
+  console.log(`Running ${process.env.NAME_APP} between 22:55 and 23:10 UTC`);
   require("./index");
 } else {
   console.log(
