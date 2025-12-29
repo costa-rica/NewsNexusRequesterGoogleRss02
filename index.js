@@ -35,7 +35,7 @@ async function main() {
   console.log("Starting main function");
   // Step 1: Create Array of Parameters for Requests - prioritized based on dateEndOfRequest
   // Step 1.1: Get the query objects from Excel file
-  const queryObjects = getRequestsParameterArrayFromExcelFile();
+  const queryObjects = await getRequestsParameterArrayFromExcelFile();
 
   // Step 1.2: Create arrays of parameters never requested and requested
   const { arrayOfParametersNeverRequested, arrayOfParametersRequested } =

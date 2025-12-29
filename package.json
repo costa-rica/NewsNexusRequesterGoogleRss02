@@ -12,8 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
     "newsnexus10db": "file:../NewsNexus10Db",
-    "xlsx": "^0.18.5",
     "xml2js": "^0.6.2"
   }
 }
