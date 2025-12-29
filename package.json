@@ -14,6 +14,7 @@
     "dotenv": "^16.5.0",
     "exceljs": "^4.4.0",
     "newsnexus10db": "file:../NewsNexus10Db",
+    "winston": "^3.19.0",
     "xml2js": "^0.6.2"
   }
 }

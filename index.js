@@ -1,4 +1,8 @@
 require("dotenv").config();
+
+// Initialize Winston logger (must be first, before any console.log calls)
+const logger = require("./modules/logger");
+
 console.log("Starting NewsNexusRequesterGoogleRss02");
 
 // Initialize database models BEFORE importing other modules
