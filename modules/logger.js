@@ -2,12 +2,26 @@ const winston = require("winston");
 const path = require("path");
 const fs = require("fs");
 
-// Determine environment
-const isProduction = process.env.NODE_ENV === "production";
+// Determine environment (three-tier system: development, testing, production)
+const nodeEnv = process.env.NODE_ENV || "development";
+const isProduction = nodeEnv === "production";
+const isTesting = nodeEnv === "testing";
+const isDevelopment = nodeEnv === "development";
+
 const appName = process.env.NAME_APP || "app";
 const logDir = process.env.PATH_TO_LOGS || "./logs";
 const maxSize = parseInt(process.env.LOG_MAX_SIZE) || 10485760; // 10MB
 const maxFiles = parseInt(process.env.LOG_MAX_FILES) || 10;
+
+// Determine log level based on environment
+let logLevel;
+if (isProduction) {
+  logLevel = "error"; // Only errors in production
+} else if (isTesting) {
+  logLevel = "info"; // Info and above in testing
+} else {
+  logLevel = "debug"; // All levels in development
+}
 
 // Define log format for production (human-readable with timestamps)
 const productionFormat = winston.format.combine(
@@ -34,14 +48,14 @@ const developmentFormat = winston.format.combine(
 
 // Create logger instance
 const logger = winston.createLogger({
-  level: isProduction ? "info" : "debug",
-  format: isProduction ? productionFormat : developmentFormat,
+  level: logLevel,
+  format: isProduction || isTesting ? productionFormat : developmentFormat,
   transports: [],
 });
 
 // Add transports based on environment
-if (isProduction) {
-  // Production: Write to rotating log files
+if (isProduction || isTesting) {
+  // Production and Testing: Write to rotating log files
   try {
     // Ensure log directory exists
     if (!fs.existsSync(logDir)) {
