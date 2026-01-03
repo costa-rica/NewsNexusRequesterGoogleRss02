@@ -8,15 +8,15 @@ const logger = require("./modules/logger");
   // Check for --run-anyway argument to bypass guardrail
   const runAnyway = process.argv.includes("--run-anyway");
 
-  // Time check: Only run between 22:55 and 23:10 UTC (unless --run-anyway is passed)
-  const targetTimeToStartAutomation = 23;
+  // Time check: Only run between 20:55 and 21:05 UTC (unless --run-anyway is passed)
+  const targetTimeToStartAutomation = 21;
   const now = new Date();
   const currentMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-  const startMinutes = (targetTimeToStartAutomation - 1) * 60 + 55; // 22:55 UTC
-  const endMinutes = targetTimeToStartAutomation * 60 + 10; // 23:10 UTC
+  const startMinutes = (targetTimeToStartAutomation - 1) * 60 + 55; // 20:55 UTC
+  const endMinutes = targetTimeToStartAutomation * 60 + 5; // 21:05 UTC
 
   if (!runAnyway && (currentMinutes < startMinutes || currentMinutes > endMinutes)) {
-    const message = `Not within allowed time window (22:55–23:10 UTC), exiting. Current UTC time: ${now.toISOString()}`;
+    const message = `Not within allowed time window (20:55–21:05 UTC), exiting. Current UTC time: ${now.toISOString()}`;
     logger.info(message);
 
     // Ensure log is written to file before exit (especially important in production mode)
@@ -33,9 +33,9 @@ const logger = require("./modules/logger");
       `Guardrail bypassed with --run-anyway flag. Current UTC time: ${now.toISOString()}`
     );
   } else {
-    logger.info(`Running ${process.env.NAME_APP} between 22:55 and 23:10 UTC`);
+    logger.info(`Running ${process.env.NAME_APP} between 20:55 and 21:05 UTC`);
   }
-  logger.info("Starting NewsNexusRequesterGoogleRss02");
+  logger.info("Starting NewsNexusRequesterGNews02");
 
   // Initialize database models BEFORE importing other modules
   const { initModels, sequelize } = require("newsnexus10db");
@@ -52,14 +52,12 @@ const logger = require("./modules/logger");
     findEndDateToQueryParameters,
     runSemanticScorer,
   } = require("./modules/utilitiesMisc");
-  const { requester } = require("./modules/requestsNewsGoogleRss");
+  const { requester } = require("./modules/requestsGNews");
 
   logger.info(
     `--------------------------------------------------------------------------------`
   );
-  logger.info(
-    `- Start NewsNexusRequesterGoogleRss02 ${new Date().toISOString()} --`
-  );
+  logger.info(`- Start ${process.env.NAME_APP} ${new Date().toISOString()} --`);
   logger.info(
     `MILISECONDS_IN_BETWEEN_REQUESTS: ${process.env.MILISECONDS_IN_BETWEEN_REQUESTS}`
   );
@@ -89,9 +87,6 @@ const logger = require("./modules/logger");
       ...arrayOfParametersRequestedSortedAscendingByDateEndOfRequest,
     ];
 
-    logger.info(
-      "- status: preparing paramters dateEndOfRequest this could take a while... updating for each row in Excel spreadsheet."
-    );
     // Step 1.5: Add the endDate to each request from the existing NewsApiRequests table
     for (let i = 0; i < arrayOfPrioritizedParameters.length; i++) {
       arrayOfPrioritizedParameters[i].dateEndOfRequest =
@@ -103,10 +98,9 @@ const logger = require("./modules/logger");
       }
     }
 
-    logger.info("- status: finished preparing paramters dateEndOfRequest");
     if (arrayOfPrioritizedParameters.length === 0) {
       logger.info(
-        "--- No (unrequested) request parameters found in Excel file. Exiting process. ---"
+        "--- No (unrequested)request parameters found in Excel file. Exiting process. ---"
       );
       return;
     }
@@ -115,45 +109,33 @@ const logger = require("./modules/logger");
     let indexMaster = 0;
     let index = 0;
 
-    // logger.info(arrayOfPrioritizedParameters);
-
     while (true) {
-      // while (indexMaster < 2) {
       const currentParams = arrayOfPrioritizedParameters[index];
-      if (!currentParams.dateEndOfRequest) {
-        logger.info(
-          `--- No dateEndOfRequest found for request index ${index} (indexMaster ${indexMaster}). Exiting process. ---`
-        );
-        break;
-      }
       let dateEndOfRequest;
 
       logger.info(
-        `-- ${indexMaster}: Start processing request for AND ${currentParams.andString} OR ${currentParams.orString} NOT ${currentParams.notString}`
+        `-- ${index}: Start processing request for AND ${currentParams.andString} OR ${currentParams.orString} NOT ${currentParams.notString}`
       );
-      // logger.info(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
-
       // Step 2.1: Verify that dateEndOfRequest is today or prior
       if (
         new Date(currentParams?.dateEndOfRequest) <=
         new Date(new Date().toISOString().split("T")[0])
       ) {
         dateEndOfRequest = await requester(currentParams, indexMaster);
-        // logger.info(`Doing some requesting 🛒 ...`);
         currentParams.dateEndOfRequest = dateEndOfRequest;
-        logger.info(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
       }
       // Step 2.2: Respect pacing
       await sleep(process.env.MILISECONDS_IN_BETWEEN_REQUESTS);
-
       logger.info(`End of ${index} request loop --`);
       index++;
       indexMaster++;
-      const limit = Number(process.env.LIMIT_MAXIMUM_MASTER_INDEX) || 5;
-
-      if (indexMaster === limit) {
-        logger.info(`--- [End process] Went through ${limit} requests ---`);
-        // await runSemanticScorer();
+      if (
+        indexMaster > Number(process.env.LIMIT_MASTER_INDEX_OF_WHILE_TRUE_LOOP)
+      ) {
+        logger.info(
+          `--- End due to indexMaster > ${process.env.LIMIT_MASTER_INDEX_OF_WHILE_TRUE_LOOP} ---`
+        );
+        await runSemanticScorer();
         break;
       }
 
@@ -163,25 +145,19 @@ const logger = require("./modules/logger");
         index === arrayOfPrioritizedParameters.length &&
         dateEndOfRequest === new Date().toISOString().split("T")[0]
       ) {
-        logger.info(
-          `--- [End process] All ${process.env.NAME_OF_ORG_REQUESTING_FROM} queries updated ---`
-        );
+        logger.info(`--- [End process] All GNews queries updated ---`);
+        await runSemanticScorer();
         break;
       }
 
-      // Step 2.3.2: [End process]Check if all requests have been processed
+      // Step 2.3.2: [Restart looping]Check if all requests have been processed and dateEndOfRequest is not today
       if (index === arrayOfPrioritizedParameters.length) {
         logger.info(
-          `--- [End process] Went through all ${arrayOfPrioritizedParameters.length} queries ---`
+          `--- [Restart looping] Went through all ${arrayOfPrioritizedParameters.length} queries and dateEndOfRequest is not today ---`
         );
-        // index = 0;
-        // await runSemanticScorer();
-        break; // probably unnecessary
+        index = 0;
       }
     }
-    logger.info("--- [End process] main and outside the while(true) loop ---");
-    // // For Testing - use for ending process early wiht limit, otherwise this will already run based on other conditions
-    runSemanticScorer();
   }
 
   function sleep(ms) {
