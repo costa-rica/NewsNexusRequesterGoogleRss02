@@ -11,7 +11,7 @@ async function getRequestsParameterArrayFromExcelFile() {
       process.env.PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED
     );
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return [];
   }
   const worksheet = workbook.worksheets[0];
@@ -73,7 +73,7 @@ function writeResponseDataFromNewsAggregator(
   requestResponseData,
   prefix = false
 ) {
-  // console.log(
+  // logger.info(
   //   "-----> Error and writing into writeResponseDataFromNewsAggregator"
   // );
   const formattedDate = new Date()
@@ -88,9 +88,9 @@ function writeResponseDataFromNewsAggregator(
   if (!fs.existsSync(datedDir)) {
     fs.mkdirSync(datedDir, { recursive: true });
   } else {
-    console.log("-----> datedDir already exists");
+    logger.info("-----> datedDir already exists");
   }
-  // console.log(
+  // logger.info(
   //   "-----> newsApiRequest ",
   //   JSON.stringify(newsApiRequest, null, 2)
   // );

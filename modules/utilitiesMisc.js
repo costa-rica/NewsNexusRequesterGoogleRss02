@@ -25,7 +25,7 @@ async function createArraysOfParametersNeverRequestedAndRequested(
   });
 
   for (const queryObj of queryObjects) {
-    // console.log(queryObj);
+    // logger.info(queryObj);
     const alreadyRequested = existingRequests.find((req) => {
       return (
         req.andString === queryObj.andString &&
@@ -95,7 +95,7 @@ async function checkRequestAndModifyDates(
     if (endDateDateObj > today) {
       endDate = today.toISOString().split("T")[0];
     }
-    console.log(`----> received enddate: ${endDate}`);
+    logger.info(`----> received enddate: ${endDate}`);
     return { adjustedStartDate: startDate, adjustedEndDate: endDate };
   }
 }
@@ -131,7 +131,7 @@ async function findEndDateToQueryParameters(queryParameters) {
 }
 
 async function runSemanticScorer() {
-  console.log(
+  logger.info(
     `Starting child process: ${process.env.PATH_AND_FILENAME_TO_SEMANTIC_SCORER}`
   );
   return new Promise((resolve, reject) => {
@@ -139,25 +139,25 @@ async function runSemanticScorer() {
       `node "${process.env.PATH_AND_FILENAME_TO_SEMANTIC_SCORER}"`,
       (error, stdout, stderr) => {
         if (error) {
-          console.error(`Error executing child process: ${error.message}`);
+          logger.error(`Error executing child process: ${error.message}`);
           return reject(error);
         }
         if (stderr) {
-          console.error(`Child process stderr: ${stderr}`);
+          logger.error(`Child process stderr: ${stderr}`);
         }
-        console.log(`Child process finished`);
+        logger.info(`Child process finished`);
         resolve(stdout);
       }
     );
   })
     .then(() => {
-      console.log(
+      logger.info(
         " [NewsNexusRequesterGoogleRss02] ✅ NewsNexusSemanticScorer02 has finished."
       );
       process.exit();
     })
     .catch(() => {
-      console.log(
+      logger.info(
         " [NewsNexusRequesterGoogleRss02] ❌ NewsNexusSemanticScorer02 has finished with error."
       );
       process.exit(1);

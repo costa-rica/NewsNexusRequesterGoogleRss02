@@ -51,10 +51,10 @@ async function requester(currentParams, indexMaster) {
   // let excludeDomainsObjArray = [];
   // let includeDomainsObjArray = [];
 
-  // console.log(
+  // logger.info(
   //   `includeDomainsArray [requester] (${includeDomainsArray.length}): ${includeDomainsArray}`
   // );
-  // console.log(
+  // logger.info(
   //   `excludeDomainsArray [requester] (${excludeDomainsArray.length}): ${excludeDomainsArray}`
   // );
 
@@ -98,7 +98,7 @@ async function requester(currentParams, indexMaster) {
   let newsApiRequestObj = null;
 
   if (adjustedStartDate === adjustedEndDate) {
-    console.log(`No request needed for ${requestParametersObject.andString}`);
+    logger.info(`No request needed for ${requestParametersObject.andString}`);
     return adjustedEndDate;
   }
 
@@ -111,26 +111,26 @@ async function requester(currentParams, indexMaster) {
       indexMaster
     ));
   } catch (error) {
-    console.error(
+    logger.error(
       `Error during ${process.env.NAME_OF_ORG_REQUESTING_FROM} API request:`,
       error
     );
     return; // prevent proceeding to storeGNewsArticles if request failed
   }
 
-  // console.log(
+  // logger.info(
   //   "-----> [in requester after makeNewsApiRequestDetailed] newsApiRequestObj ",
   //   newsApiRequestObj
   // );
   // Step 4: store the articles
   if (!requestResponseData?.results) {
-    console.log(
+    logger.info(
       `No articles received from ${process.env.NAME_OF_ORG_REQUESTING_FROM} request response`
     );
   } else {
     // Store articles and update NewsApiRequest
     await storeNewsApiArticles(requestResponseData, newsApiRequestObj);
-    console.log(`completed NewsApiRequest.id: ${newsApiRequestObj.id}`);
+    logger.info(`completed NewsApiRequest.id: ${newsApiRequestObj.id}`);
   }
 
   // return "2025-05-03";
@@ -175,7 +175,7 @@ async function makeGoogleRssRequest(
   // queryParams.push(`excludecategory=entertainment,politics,world`);
 
   const requestUrl = `${source.url}search?${queryParams.join("&")}`;
-  // console.log("- [makeNewsApiRequestDetailed] requestUrl", requestUrl);
+  // logger.info("- [makeNewsApiRequestDetailed] requestUrl", requestUrl);
   // let status = "success";
   let requestResponseData = {
     results: [],
@@ -184,14 +184,14 @@ async function makeGoogleRssRequest(
   let newsApiRequestObj = null;
   let xmlText = null;
 
-  console.log("requestUrl: ", requestUrl);
+  logger.info("requestUrl: ", requestUrl);
 
   if (process.env.ACTIVATE_API_REQUESTS_TO_OUTSIDE_SOURCES === "true") {
     try {
       const response = await fetch(requestUrl);
       xmlText = await response.text();
     } catch (parseErr) {
-      console.error("❌ XML Parsing Error:", parseErr);
+      logger.error("❌ XML Parsing Error:", parseErr);
       requestResponseData = {
         status: "error",
         error: parseErr,
@@ -216,7 +216,7 @@ async function makeGoogleRssRequest(
       });
       // requestResponseData.status = "ok";
     } catch (parseErr) {
-      console.error("❌ XML Parsing Error:", parseErr);
+      logger.error("❌ XML Parsing Error:", parseErr);
       requestResponseData = {
         status: "error",
         error: parseErr,
@@ -226,7 +226,7 @@ async function makeGoogleRssRequest(
 
     if (requestResponseData.status === "error") {
       // status = "error";
-      // console.log(" #1 writeResponseDataFromNewsAggregator");
+      // logger.info(" #1 writeResponseDataFromNewsAggregator");
       writeResponseDataFromNewsAggregator(
         source.id,
         { id: `failed_indexMaster${indexMaster}`, url: requestUrl },
@@ -240,7 +240,7 @@ async function makeGoogleRssRequest(
         requestResponseData.results?.code === "RateLimitExceeded" ||
         requestResponseData.results?.message?.includes("Rate limit exceeded")
       ) {
-        console.log(
+        logger.info(
           `--> ⛔ Ending process: rate limited by ${process.env.NAME_OF_ORG_REQUESTING_FROM}`
         );
         await runSemanticScorer();
@@ -278,7 +278,7 @@ async function makeGoogleRssRequest(
 }
 
 async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
-  // console.log("-----> newsApiRequest ", newsApiRequest);
+  // logger.info("-----> newsApiRequest ", newsApiRequest);
 
   // leverages the hasOne association from the NewsArticleAggregatorSource model
   const newsApiSource = await NewsArticleAggregatorSource.findOne({
@@ -324,7 +324,7 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
     await newsApiRequest.update({
       countOfArticlesSavedToDbFromRequest: countOfArticlesSavedToDbFromRequest,
     });
-    // console.log(" #2 writeResponseDataFromNewsAggregator");
+    // logger.info(" #2 writeResponseDataFromNewsAggregator");
     writeResponseDataFromNewsAggregator(
       newsApiSource.id,
       newsApiRequest,
@@ -333,9 +333,9 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
       // newsApiRequest.url
     );
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     requestResponseData.error = error;
-    // console.log(" #3 writeResponseDataFromNewsAggregator");
+    // logger.info(" #3 writeResponseDataFromNewsAggregator");
     writeResponseDataFromNewsAggregator(
       newsApiSource.id,
       newsApiRequest,
@@ -354,7 +354,7 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
 //       "The domain you provided does not exist"
 //     )
 //   ) {
-//     console.log(
+//     logger.info(
 //       "- [makeNewsDataIoRequest] invalid domain: ",
 //       requestResponseData.results?.message?.[0]?.invalid_domain
 //     );
@@ -369,11 +369,11 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
 //       }
 //     );
 //   } else {
-//     console.log("Correctly handled invalid_domain with no message 🤩");
+//     logger.info("Correctly handled invalid_domain with no message 🤩");
 //   }
 
 //   if (requestResponseData.results.message[0]?.suggestion) {
-//     console.log(
+//     logger.info(
 //       "- [makeNewsDataIoRequest] suggestion: ",
 //       requestResponseData.results.message[0].suggestion
 //     );
@@ -382,7 +382,7 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
 //       const suggestions = msg.suggestion;
 
 //       if (invalidDomain) {
-//         console.log(
+//         logger.info(
 //           "- [makeNewsDataIoRequest] Archiving invalid domain:",
 //           invalidDomain
 //         );
@@ -398,12 +398,12 @@ async function storeNewsApiArticles(requestResponseData, newsApiRequest) {
 //             const websiteDomain = await WebsiteDomain.create({
 //               name: suggestion,
 //             });
-//             console.log(
+//             logger.info(
 //               "- [makeNewsDataIoRequest] Added suggestion:",
 //               websiteDomain.name
 //             );
 //           } catch (err) {
-//             console.warn(
+//             logger.warn(
 //               `⚠️ Failed to add suggestion ${suggestion}:`,
 //               err.message
 //             );

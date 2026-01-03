@@ -1,14 +1,14 @@
 require("dotenv").config();
 
-// Initialize Winston logger (must be first, before any console.log calls)
+// Initialize Winston logger (must be first, before any logger.info calls)
 const logger = require("./modules/logger");
 
-console.log("Starting NewsNexusRequesterGoogleRss02");
+logger.info("Starting NewsNexusRequesterGoogleRss02");
 
 // Initialize database models BEFORE importing other modules
 const { initModels, sequelize } = require("newsnexus10db");
 initModels();
-console.log(
+logger.info(
   `database location: ${process.env.PATH_DATABASE}${process.env.NAME_DB}`
 );
 
@@ -22,21 +22,21 @@ const {
 } = require("./modules/utilitiesMisc");
 const { requester } = require("./modules/requestsNewsGoogleRss");
 
-console.log(
+logger.info(
   `--------------------------------------------------------------------------------`
 );
-console.log(
+logger.info(
   `- Start NewsNexusRequesterGoogleRss02 ${new Date().toISOString()} --`
 );
-console.log(
+logger.info(
   `MILISECONDS_IN_BETWEEN_REQUESTS: ${process.env.MILISECONDS_IN_BETWEEN_REQUESTS}`
 );
-console.log(
+logger.info(
   `--------------------------------------------------------------------------------`
 );
 
 async function main() {
-  console.log("Starting main function");
+  logger.info("Starting main function");
   // Step 1: Create Array of Parameters for Requests - prioritized based on dateEndOfRequest
   // Step 1.1: Get the query objects from Excel file
   const queryObjects = await getRequestsParameterArrayFromExcelFile();
@@ -57,7 +57,7 @@ async function main() {
     ...arrayOfParametersRequestedSortedAscendingByDateEndOfRequest,
   ];
 
-  console.log(
+  logger.info(
     "- status: preparing paramters dateEndOfRequest this could take a while... updating for each row in Excel spreadsheet."
   );
   // Step 1.5: Add the endDate to each request from the existing NewsApiRequests table
@@ -65,15 +65,15 @@ async function main() {
     arrayOfPrioritizedParameters[i].dateEndOfRequest =
       await findEndDateToQueryParameters(arrayOfPrioritizedParameters[i]);
     if (i % 1000 === 0) {
-      console.log(
+      logger.info(
         `-- ${i} of ${arrayOfPrioritizedParameters.length} rows processed --`
       );
     }
   }
 
-  console.log("- status: finished preparing paramters dateEndOfRequest");
+  logger.info("- status: finished preparing paramters dateEndOfRequest");
   if (arrayOfPrioritizedParameters.length === 0) {
-    console.log(
+    logger.info(
       "--- No (unrequested) request parameters found in Excel file. Exiting process. ---"
     );
     return;
@@ -83,23 +83,23 @@ async function main() {
   let indexMaster = 0;
   let index = 0;
 
-  // console.log(arrayOfPrioritizedParameters);
+  // logger.info(arrayOfPrioritizedParameters);
 
   while (true) {
     // while (indexMaster < 2) {
     const currentParams = arrayOfPrioritizedParameters[index];
     if (!currentParams.dateEndOfRequest) {
-      console.log(
+      logger.info(
         `--- No dateEndOfRequest found for request index ${index} (indexMaster ${indexMaster}). Exiting process. ---`
       );
       break;
     }
     let dateEndOfRequest;
 
-    console.log(
+    logger.info(
       `-- ${indexMaster}: Start processing request for AND ${currentParams.andString} OR ${currentParams.orString} NOT ${currentParams.notString}`
     );
-    // console.log(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
+    // logger.info(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
 
     // Step 2.1: Verify that dateEndOfRequest is today or prior
     if (
@@ -107,20 +107,20 @@ async function main() {
       new Date(new Date().toISOString().split("T")[0])
     ) {
       dateEndOfRequest = await requester(currentParams, indexMaster);
-      // console.log(`Doing some requesting 🛒 ...`);
+      // logger.info(`Doing some requesting 🛒 ...`);
       currentParams.dateEndOfRequest = dateEndOfRequest;
-      console.log(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
+      logger.info(`dateEndOfRequest: ${currentParams.dateEndOfRequest}`);
     }
     // Step 2.2: Respect pacing
     await sleep(process.env.MILISECONDS_IN_BETWEEN_REQUESTS);
 
-    console.log(`End of ${index} request loop --`);
+    logger.info(`End of ${index} request loop --`);
     index++;
     indexMaster++;
     const limit = Number(process.env.LIMIT_MAXIMUM_MASTER_INDEX) || 5;
 
     if (indexMaster === limit) {
-      console.log(`--- [End process] Went through ${limit} requests ---`);
+      logger.info(`--- [End process] Went through ${limit} requests ---`);
       // await runSemanticScorer();
       break;
     }
@@ -131,7 +131,7 @@ async function main() {
       index === arrayOfPrioritizedParameters.length &&
       dateEndOfRequest === new Date().toISOString().split("T")[0]
     ) {
-      console.log(
+      logger.info(
         `--- [End process] All ${process.env.NAME_OF_ORG_REQUESTING_FROM} queries updated ---`
       );
       break;
@@ -139,7 +139,7 @@ async function main() {
 
     // Step 2.3.2: [End process]Check if all requests have been processed
     if (index === arrayOfPrioritizedParameters.length) {
-      console.log(
+      logger.info(
         `--- [End process] Went through all ${arrayOfPrioritizedParameters.length} queries ---`
       );
       // index = 0;
@@ -147,7 +147,7 @@ async function main() {
       break; // probably unnecessary
     }
   }
-  console.log("--- [End process] main and outside the while(true) loop ---");
+  logger.info("--- [End process] main and outside the while(true) loop ---");
   // // For Testing - use for ending process early wiht limit, otherwise this will already run based on other conditions
   runSemanticScorer();
 }

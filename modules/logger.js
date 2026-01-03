@@ -72,7 +72,7 @@ if (isProduction || isTesting) {
     );
   } catch (error) {
     // Fall back to console if file logging fails
-    console.error(
+    logger.error(
       "WARNING: Failed to initialize file logging, falling back to console:",
       error.message
     );
@@ -84,11 +84,11 @@ if (isProduction || isTesting) {
 }
 
 // Monkey-patch console methods to use Winston
-console.log = (...args) => logger.info(args.join(" "));
-console.error = (...args) => logger.error(args.join(" "));
-console.warn = (...args) => logger.warn(args.join(" "));
-console.info = (...args) => logger.info(args.join(" "));
-console.debug = (...args) => logger.debug(args.join(" "));
+logger.info = (...args) => logger.info(args.join(" "));
+logger.error = (...args) => logger.error(args.join(" "));
+logger.warn = (...args) => logger.warn(args.join(" "));
+logger.info = (...args) => logger.info(args.join(" "));
+logger.debug = (...args) => logger.debug(args.join(" "));
 
 // Export logger for direct usage (Phase 2 migration)
 module.exports = logger;
