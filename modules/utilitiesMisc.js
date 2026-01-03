@@ -3,6 +3,7 @@ const {
   NewsArticleAggregatorSource,
 } = require("newsnexus10db");
 const { exec } = require("child_process");
+const logger = require("./logger");
 
 async function createArraysOfParametersNeverRequestedAndRequested(
   queryObjects
@@ -134,9 +135,17 @@ async function runSemanticScorer() {
   logger.info(
     `Starting child process: ${process.env.PATH_AND_FILENAME_TO_SEMANTIC_SCORER}`
   );
+
+  // Prepare environment variables for child process
+  const childEnv = {
+    ...process.env, // Inherit all parent environment variables
+    NAME_APP: process.env.NAME_CHILD_PROCESS_SEMANTIC_SCORER, // Pass child process name
+  };
+
   return new Promise((resolve, reject) => {
     exec(
       `node "${process.env.PATH_AND_FILENAME_TO_SEMANTIC_SCORER}"`,
+      { env: childEnv }, // Pass environment variables to child
       (error, stdout, stderr) => {
         if (error) {
           logger.error(`Error executing child process: ${error.message}`);
