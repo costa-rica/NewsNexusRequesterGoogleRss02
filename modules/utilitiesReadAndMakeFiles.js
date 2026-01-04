@@ -1,6 +1,7 @@
 const ExcelJS = require("exceljs");
 const fs = require("fs");
 const path = require("path");
+const logger = require("./logger");
 
 async function getRequestsParameterArrayFromExcelFile() {
   // Read the workbook

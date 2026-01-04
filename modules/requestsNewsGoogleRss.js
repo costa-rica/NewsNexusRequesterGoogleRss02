@@ -16,6 +16,7 @@ const {
 } = require("./utilitiesMisc");
 // const xml2js = require("xml2js");
 const { parseStringPromise } = require("xml2js");
+const logger = require("./logger");
 
 async function requester(currentParams, indexMaster) {
   // Step 1: prepare paramters
