@@ -8,15 +8,49 @@ const logger = require("./modules/logger");
   // Check for --run-anyway argument to bypass guardrail
   const runAnyway = process.argv.includes("--run-anyway");
 
-  // Time check: Only run between 22:55 and 23:10 UTC (unless --run-anyway is passed)
-  const targetTimeToStartAutomation = 23;
+  // Parse guardrail configuration from environment variables
+  const guardrailTargetTime = process.env.GUARDRAIL_TARGET_TIME || "23:00";
+  const guardrailWindowMins = parseInt(process.env.GUARDRAIL_TARGET_WINDOW_IN_MINS) || 5;
+
+  // Validate and parse the target time (HH:MM format)
+  const timeMatch = guardrailTargetTime.match(/^(\d{1,2}):(\d{2})$/);
+  if (!timeMatch) {
+    logger.error(`Invalid GUARDRAIL_TARGET_TIME format: "${guardrailTargetTime}". Expected HH:MM format.`);
+    process.exit(1);
+  }
+
+  const targetHour = parseInt(timeMatch[1]);
+  const targetMinute = parseInt(timeMatch[2]);
+
+  if (targetHour < 0 || targetHour > 23 || targetMinute < 0 || targetMinute > 59) {
+    logger.error(`Invalid GUARDRAIL_TARGET_TIME: "${guardrailTargetTime}". Hour must be 0-23, minute must be 0-59.`);
+    process.exit(1);
+  }
+
+  // Calculate the time window in minutes from midnight
+  const targetMinutes = targetHour * 60 + targetMinute;
+  const startMinutes = targetMinutes - guardrailWindowMins;
+  const endMinutes = targetMinutes + guardrailWindowMins;
+
+  // Get current time
   const now = new Date();
   const currentMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-  const startMinutes = (targetTimeToStartAutomation - 1) * 60 + 55; // 22:55 UTC
-  const endMinutes = targetTimeToStartAutomation * 60 + 10; // 23:10 UTC
 
+  // Format times for logging (HH:MM)
+  const formatTime = (mins) => {
+    // Handle negative minutes (wraps to previous day)
+    const normalizedMins = ((mins % 1440) + 1440) % 1440; // 1440 = 24 * 60
+    const h = Math.floor(normalizedMins / 60);
+    const m = normalizedMins % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  };
+
+  const startTimeStr = formatTime(startMinutes);
+  const endTimeStr = formatTime(endMinutes);
+
+  // Time check: Only run within the configured window (unless --run-anyway is passed)
   if (!runAnyway && (currentMinutes < startMinutes || currentMinutes > endMinutes)) {
-    const message = `Not within allowed time window (22:55–23:10 UTC), exiting. Current UTC time: ${now.toISOString()}`;
+    const message = `Not within allowed time window (${startTimeStr}–${endTimeStr} UTC), exiting. Current UTC time: ${now.toISOString()}`;
     logger.info(message);
 
     // Ensure log is written to file before exit (especially important in production mode)
@@ -33,7 +67,7 @@ const logger = require("./modules/logger");
       `Guardrail bypassed with --run-anyway flag. Current UTC time: ${now.toISOString()}`
     );
   } else {
-    logger.info(`Running ${process.env.NAME_APP} between 22:55 and 23:10 UTC`);
+    logger.info(`Running ${process.env.NAME_APP} within time window ${startTimeStr}–${endTimeStr} UTC`);
   }
   logger.info("Starting NewsNexusRequesterGoogleRss02");
 

@@ -1,4 +1,4 @@
-# NewsNexusRequesterGoogleNewsRss02
+# NewsNexusRequesterGoogleRss02
 
 ## Overview
 
@@ -34,7 +34,7 @@ This app requires importing or adding the `newsnexus10db` package, which provide
 ### workstation
 
 ```
-NAME_APP=NewsNexusRequesterGoogleNewsRss02
+NAME_APP=NewsNexusRequesterGoogleRss02
 NAME_DB=newsnexus10.db
 PATH_DATABASE=/Users/nick/Documents/_databases/NewsNexus10/
 PATH_TO_API_RESPONSE_JSON_FILES=/Users/nick/Documents/_project_resources/NewsNexus10/api_response_json_files
@@ -51,7 +51,7 @@ LIMIT_MAXIMUM_MASTER_INDEX=210
 ### server
 
 ```
-NAME_APP=NewsNexusRequesterGoogleNewsRss02
+NAME_APP=NewsNexusRequesterGoogleRss02
 NAME_DB=newsnexus10.db
 PATH_DATABASE=/home/nick/databases/NewsNexus10/
 PATH_TO_API_RESPONSE_JSON_FILES=/home/nick/project_resources/NewsNexus10/api_response_json_files
