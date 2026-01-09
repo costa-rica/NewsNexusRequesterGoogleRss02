@@ -1,8 +1,10 @@
-# Node.js Logging Requirements V04
+# Node.js Logging Requirements V05
 
 ## Overview
 
 This document specifies logging requirements for Node.js applications using Winston. These requirements apply to both standard Node.js and Next.js applications.
+
+- modificaiton from v04: renamed example `NAME_CHILD_PROCESS_SCORER` to `NAME_CHILD_PROCESS_SEMANTIC_SCORER`
 
 ## Pre-Implementation: Console Statement Migration
 
@@ -10,15 +12,16 @@ This document specifies logging requirements for Node.js applications using Wins
 
 Before implementing Winston logging, manually search and replace all console statements:
 
-| Search | Replace |
-|--------|---------|
-| `console.log` | `logger.info` |
+| Search          | Replace        |
+| --------------- | -------------- |
+| `console.log`   | `logger.info`  |
 | `console.error` | `logger.error` |
-| `console.warn` | `logger.warn` |
-| `console.info` | `logger.info` |
+| `console.warn`  | `logger.warn`  |
+| `console.info`  | `logger.info`  |
 | `console.debug` | `logger.debug` |
 
 **Workflow:**
+
 1. Create a new branch
 2. Perform search and replace operations in your IDE
 3. Commit changes to the branch
@@ -27,16 +30,19 @@ Before implementing Winston logging, manually search and replace all console sta
 ## Logging Modes
 
 ### Development Mode
+
 - **Output**: Console only
 - **Log Files**: None created
 - **Use Case**: Local development
 
 ### Testing Mode
+
 - **Output**: Console AND log files (both simultaneously)
 - **Log Files**: Rotating files with retention
 - **Use Case**: Automated testing, staging environments
 
 ### Production Mode
+
 - **Output**: Log files only
 - **Log Files**: Rotating files with retention
 - **Use Case**: Production deployments
@@ -46,33 +52,39 @@ Before implementing Winston logging, manually search and replace all console sta
 ### Required Variables
 
 **NODE_ENV** (required)
+
 - Values: `development`, `testing`, or `production`
 - Determines logging mode
 - Next.js fallback: Use `NEXT_PUBLIC_MODE` if `NODE_ENV` is not set
 
 **NAME_APP** (required)
+
 - Application identifier
 - Used as log file name: `[NAME_APP].log`
 - Rotated files: `[NAME_APP]1.log`, `[NAME_APP]2.log`, etc.
 
 **PATH_TO_LOGS** (required)
+
 - Absolute path to log directory
 - Must exist or be creatable by the application
 
-**NAME_CHILD_PROCESS_[descriptor]** (required for apps with child processes)
+**NAME*CHILD_PROCESS*[descriptor]** (required for apps with child processes)
+
 - Parent process passes child process name via this variable
 - Child receives value as its `NAME_APP`
-- Example: `NAME_CHILD_PROCESS_SCORER=NewsNexusSemanticScorer02`
+- Example: `NAME_CHILD_PROCESS_SEMANTIC_SCORER=NewsNexusSemanticScorer02`
 
 ### Optional Variables
 
 **LOG_MAX_SIZE**
+
 - Default: `5` (megabytes)
 - Specify value in megabytes (e.g., `5` = 5MB)
 - Logger implementation converts to bytes internally for Winston
 - Maximum size of each log file before rotation
 
 **LOG_MAX_FILES**
+
 - Default: `5`
 - Number of rotated log files to retain
 
